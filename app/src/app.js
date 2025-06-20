@@ -25,6 +25,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.Auth.user);
+  const [refreshAvailableUsers, setRefreshAvailableUsers] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -46,20 +47,21 @@ const App = () => {
   return (
     <div className="flex h-screen flex-col">
       <Router>
-        {user && <Header />}
+        {user && <Header onAvailabilityChange={() => setRefreshAvailableUsers((r) => !r)} />}
         <div className="flex flex-grow overflow-hidden">
           {user && <Drawer />}
           <div className="flex-1 flex flex-col">
             <main className="flex-1 overflow-y-scroll">
               <Switch>
                 <Route path="/auth" component={Auth} />
-                <RestrictedRoute path="/user" component={User} />
+                {/* <RestrictedRoute path="/user" component={User} /> */}
+                <RestrictedRoute path="/user" render={(props) => <User {...props} refresh={refreshAvailableUsers} />} />
 
                 <RestrictedRoute path="/activity" component={Activity} />
 
                 <RestrictedRoute path="/account" component={Account} />
                 <RestrictedRoute path="/project" component={Project} />
-                <RestrictedRoute path="/" component={Home} />
+                <RestrictedRoute path="/" render={(props) => <Home {...props} refresh={refreshAvailableUsers} />} />
               </Switch>
             </main>
           </div>
@@ -69,10 +71,10 @@ const App = () => {
   );
 };
 
-const RestrictedRoute = ({ component: Component, role, ...rest }) => {
+const RestrictedRoute = ({ component: Component, render, ...rest }) => {
   const user = useSelector((state) => state.Auth.user);
   if (!user) return <Redirect to={{ pathname: "/auth" }} />;
-  return <Route {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: "/auth" }} />)} />;
+  return <Route {...rest} render={(props) => (user ? render ? render(props) : Component ? <Component {...props} /> : null : <Redirect to="/auth" />)} />;
 };
 
 export default App;

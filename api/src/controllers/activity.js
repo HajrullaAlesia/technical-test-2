@@ -37,6 +37,54 @@ router.get("/", passport.authenticate("user", { session: false }), async (req, r
     res.status(500).send({ ok: false, code: SERVER_ERROR, error });
   }
 });
+router.post("/search", passport.authenticate("user", { session: false }), async (req, res) => {
+  try {
+    const { date, projectName } = req.body;
+
+    if (!date) {
+      return res.status(400).send({ ok: false, error: "Missing date" });
+    }
+
+    const selected = new Date(parseInt(date));
+    const firstDay = new Date(selected.getFullYear(), selected.getMonth(), 1);
+    const lastDay = new Date(selected.getFullYear(), selected.getMonth() + 1, 0);
+
+    const match = {
+      organisation: req.user.organisation,
+      date: { $gte: firstDay, $lte: lastDay },
+    };
+
+    const pipeline = [
+      { $match: match },
+      {
+        $lookup: {
+          from: "projects",
+          localField: "projectId",
+          foreignField: "_id",
+          as: "project",
+        },
+      },
+      { $unwind: "$project" },
+    ];
+
+    if (projectName && projectName.trim() !== "") {
+      pipeline.push({
+        $match: {
+          "project.name": { $regex: projectName, $options: "i" },
+        },
+      });
+    }
+
+    pipeline.push({ $sort: { created_at: -1 } });
+
+    const data = await ActivityObject.aggregate(pipeline);
+
+    return res.status(200).send({ ok: true, data });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ ok: false, code: SERVER_ERROR, error });
+  }
+});
 
 router.post("/", passport.authenticate("user", { session: false }), async (req, res) => {
   try {

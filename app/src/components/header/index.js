@@ -6,7 +6,7 @@ import Logo from "../../assets/logo_full_blue.png";
 import { setUser } from "../../redux/auth/actions";
 import api from "../../services/api";
 
-const Header = () => {
+const Header = ({ onAvailabilityChange }) => {
   const [open, setOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const dispatch = useDispatch();
@@ -21,6 +21,7 @@ const Header = () => {
       const res = await api.put(`/user`, { availability });
       dispatch(setUser(res.data));
       toast.success("Status Updated!");
+      onAvailabilityChange();
     }
   }
 

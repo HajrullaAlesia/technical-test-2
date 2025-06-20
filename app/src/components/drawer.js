@@ -7,16 +7,20 @@ const Drawer = () => {
 };
 
 const DrawerDesktop = () => {
+  const [open, setOpen] = React.useState(false);
   return (
     <div className="flex-shrink-0 overflow-y-auto">
       <ul className={`list-none px-3 z-10 border-r border-[#a0a6b124] space-y-2 translate-x-0 duration-200`}>
-        <Section title="Général">
-          <Link to="/" title="Home" Icon={HomeIcon} />
-          <Link to="/project" title="Projects" Icon={ProjectsIcon} />
-          <Link to="/activity" title="Activities" Icon={ActivitiesIcon} />
-          <Link to="/user" title="People" Icon={PeopleIcon} />
+        <Section title="Général" setOpen={setOpen}>
+          {open && (
+            <div>
+              <Link to="/" title="Home" Icon={HomeIcon} />
+              <Link to="/project" title="Projects" Icon={ProjectsIcon} />
+              <Link to="/activity" title="Activities" Icon={ActivitiesIcon} />
+              <Link to="/user" title="People" Icon={PeopleIcon} />
+            </div>
+          )}
         </Section>
-
         <div className="h-10" />
       </ul>
     </div>
@@ -40,7 +44,7 @@ const Link = ({ Icon, title, to, onClick = () => {} }) => {
   );
 };
 
-const Section = ({ children, title }) => {
+const Section = ({ children, title, setOpen }) => {
   return (
     <div>
       <h1

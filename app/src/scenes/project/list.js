@@ -13,12 +13,16 @@ const ProjectList = () => {
   const [activeProjects, setActiveProjects] = useState(null);
 
   const history = useHistory();
+  const getProjects = async (searchName = "") => {
+    const { data } = await api.post("/project/search", {
+      name: searchName,
+      status: "active",
+    });
+    setProjects(data);
+  };
 
   useEffect(() => {
-    (async () => {
-      const { data: u } = await api.get("/project");
-      setProjects(u);
-    })();
+    getProjects();
   }, []);
 
   useEffect(() => {
@@ -29,13 +33,14 @@ const ProjectList = () => {
   if (!projects || !activeProjects) return <Loader />;
 
   const handleSearch = (searchedValue) => {
-    const p = (projects || []).filter((p) => p.status === "active").filter((e) => e.name.toLowerCase().includes(searchedValue.toLowerCase()));
-    setActiveProjects(p);
+    getProjects(searchedValue);
+    // const p = (projects || []).filter((p) => p.status === "active").filter((e) => e.name.toLowerCase().includes(searchedValue.toLowerCase()));
+    // setActiveProjects(p);
   };
 
   return (
     <div className="w-full p-2 md:!px-8">
-      <Create onChangeSearch={handleSearch} />
+      <Create onChangeSearch={handleSearch} onProjectCreated={getProjects} />
       <div className="py-3">
         {activeProjects.map((hit) => {
           return (
@@ -92,7 +97,7 @@ const Budget = ({ project }) => {
   return <ProgressBar percentage={width} max={budget_max_monthly} value={total} />;
 };
 
-const Create = ({ onChangeSearch }) => {
+const Create = ({ onChangeSearch, onProjectCreated }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -146,6 +151,7 @@ const Create = ({ onChangeSearch }) => {
                   if (!res.ok) throw res;
                   toast.success("Created!");
                   setOpen(false);
+                  await onProjectCreated();
                 } catch (e) {
                   console.log(e);
                   toast.error("Some Error!", e.code);

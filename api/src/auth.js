@@ -26,7 +26,7 @@ class Auth {
 
   async signin(req, res) {
     let { password, username } = req.body;
-    username = (username || "").trim().toLowerCase();
+    username = (username || "").trim();
 
     if (!username || !password) return res.status(400).send({ ok: false, code: EMAIL_AND_PASSWORD_REQUIRED });
 

@@ -6,35 +6,48 @@ import Loader from "../../components/loader";
 import LoadingButton from "../../components/loadingButton";
 import api from "../../services/api";
 
-const NewList = () => {
-  const [users, setUsers] = useState(null);
+const NewList = ({ refresh }) => {
+  const [users, setUsers] = useState(0);
   const [projects, setProjects] = useState([]);
   const [usersFiltered, setUsersFiltered] = useState(null);
   const [filter, setFilter] = useState({ status: "active", availability: "", search: "" });
 
+  const fetchUsers = async () => {
+    try {
+      const { data, total } = await api.post("/user/search", {
+        status: filter.status,
+        contract: filter.contract,
+        availability: filter.availability,
+        search: filter.search,
+      });
+      console.log("data", data);
+      setUsersFiltered(data);
+      setUsers(total);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch users");
+    }
+  };
   useEffect(() => {
-    (async () => {
-      const { data } = await api.get("/user");
-      setUsers(data);
-    })();
+    fetchUsers();
     getProjects();
-  }, []);
+  }, [refresh, filter]);
 
   async function getProjects() {
     const res = await api.get("/project");
     setProjects(res.data);
   }
 
-  useEffect(() => {
-    if (!users) return;
-    setUsersFiltered(
-      users
-        .filter((u) => !filter?.status || u.status === filter?.status)
-        .filter((u) => !filter?.contract || u.contract === filter?.contract)
-        .filter((u) => !filter?.availability || u.availability === filter?.availability)
-        .filter((u) => !filter?.search || u.name.toLowerCase().includes(filter?.search.toLowerCase())),
-    );
-  }, [users, filter]);
+  // useEffect(() => {
+  //   if (!users) return;
+  //   setUsersFiltered(
+  //     users
+  //       .filter((u) => !filter?.status || u.status === filter?.status)
+  //       .filter((u) => !filter?.contract || u.contract === filter?.contract)
+  //       .filter((u) => !filter?.availability || u.availability === filter?.availability)
+  //       .filter((u) => !filter?.search || u.name?.toLowerCase().includes(filter?.search.toLowerCase())),
+  //   );
+  // }, [users, filter]);
 
   if (!usersFiltered) return <Loader />;
 
@@ -67,7 +80,7 @@ const NewList = () => {
             <FilterStatus filter={filter} setFilter={setFilter} />
             <div>
               <span className="text-sm font-normal text-gray-500">
-                <span className="text-base font-medium text-gray-700">{usersFiltered.length}</span> of {users.length}
+                <span className="text-base font-medium text-gray-700">{usersFiltered.length}</span> of {users}
               </span>
             </div>
           </div>
@@ -128,7 +141,7 @@ const Create = () => {
                     <div className="flex justify-between flex-wrap">
                       <div className="w-full md:w-[48%] mt-2">
                         <div className="text-[14px] text-[#212325] font-medium	">Name</div>
-                        <input className="projectsInput text-[14px] font-normal text-[#212325] rounded-[10px]" name="username" value={values.username} onChange={handleChange} />
+                        <input className="projectsInput text-[14px] font-normal text-[#212325] rounded-[10px]" name="name" value={values.name} onChange={handleChange} />
                       </div>
                       <div className="w-full md:w-[48%] mt-2">
                         <div className="text-[14px] text-[#212325] font-medium	">Email</div>

@@ -9,7 +9,7 @@ require("./mongo");
 const { PORT, APP_URL } = require("./config.js");
 
 const app = express();
-
+require("./passport")(app);
 const origin = [APP_URL, "https://join.le-stud.com"];
 
 app.use(cors({ credentials: true, origin }));
@@ -28,7 +28,5 @@ const d = new Date();
 app.get("/", async (req, res) => {
   res.status(200).send("API LOCAL TIME :  " + d.toLocaleString());
 });
-
-require("./passport")(app);
 
 app.listen(PORT, () => console.log("Listening on port " + PORT));

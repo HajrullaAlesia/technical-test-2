@@ -23,6 +23,7 @@
     "mongoose": "^5.9.28",
     "multer": "^1.4.2",
     "node-fetch": "^2.6.1",
+    "nodemailer": "^7.0.3",
     "parse-link-header": "^2.0.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",

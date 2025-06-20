@@ -28,7 +28,7 @@ export default function EditProject() {
     if (!confirm) return;
     await api.remove(`/project/${id}`);
     toast.success("successfully removed!");
-    history.push("/projects");
+    history.push("/project");
   }
 
   if (!project) return <Loader />;

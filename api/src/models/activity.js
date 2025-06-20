@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const MODELNAME = "activity";
 
 const Schema = new mongoose.Schema({
-  projectId: { type: String },
+  //projectId: { type: String },
+  projectId: { type: mongoose.Schema.Types.ObjectId, ref: "project" },
   userId: { type: String },
   userAvatar: { type: String, default: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" },
   userCostPerDay: { type: Number },

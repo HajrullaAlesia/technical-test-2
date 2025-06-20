@@ -64,6 +64,32 @@ router.get("/", passport.authenticate("user", { session: false }), async (req, r
   }
 });
 
+router.post("/search", passport.authenticate("user", { session: false }), async (req, res) => {
+  try {
+    const { status, contract, availability, search } = req.body;
+
+    let query = {
+      organisation: req.user.organisation,
+    };
+
+    if (status) query.status = status;
+    if (contract) query.contract = contract;
+    if (availability) query.availability = availability;
+    if (search) query.name = { $regex: search, $options: "i" };
+
+    const users = await UserObject.find(query).sort("-last_login_at");
+
+    const total = await UserObject.countDocuments({
+      organisation: req.user.organisation,
+    });
+
+    return res.status(200).send({ ok: true, data: users, total });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ ok: false, code: SERVER_ERROR, error });
+  }
+});
+
 router.put("/:id", passport.authenticate("user", { session: false }), async (req, res) => {
   try {
     const obj = req.body;

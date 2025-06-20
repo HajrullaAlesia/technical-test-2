@@ -36,7 +36,7 @@ const Activity = () => {
       <div className="flex flex-wrap gap-5 p-2 md:!px-8">
         <SelectProject
           value={project}
-          onChange={(e) => setProject(e.name)}
+          onChange={(e) => setProject(e ? e.name : "")}
           className="w-[180px] bg-[#FFFFFF] text-[#212325] py-[10px] px-[14px] rounded-[10px] border-r-[16px] border-[transparent] cursor-pointer shadow-sm font-normal text-[14px]"
         />
         <SelectMonth start={-3} indexDefaultValue={3} value={date} onChange={(e) => setDate(e.target.value)} showArrows />
@@ -50,18 +50,35 @@ const Activities = ({ date, user, project }) => {
   const [activities, setActivities] = useState([]);
   const [open, setOpen] = useState(null);
 
+  // useEffect(() => {
+  //   (async () => {
+  //     const { data } = await api.get(`/activity?date=${date.getTime()}&user=${user.name}&project=${project}`);
+  //     const projects = await api.get(`/project/list`);
+  //     setActivities(
+  //       data.map((activity) => {
+  //         return { ...activity, projectName: (activity.projectName = projects.data.find((project) => project._id === activity.projectId)?.name) };
+  //       }),
+  //     );
+  //     setOpen(null);
+  //   })();
+  // }, [date]);
+  const fetchActivities = async () => {
+    const { data } = await api.post("/activity/search", {
+      date: date.getTime(),
+      projectName: project,
+    });
+
+    const activitiesWithName = data.map((activity) => ({
+      ...activity,
+      projectName: activity.project?.name ?? "",
+    }));
+
+    setActivities(activitiesWithName);
+    setOpen(null);
+  };
   useEffect(() => {
-    (async () => {
-      const { data } = await api.get(`/activity?date=${date.getTime()}&user=${user.name}&project=${project}`);
-      const projects = await api.get(`/project/list`);
-      setActivities(
-        data.map((activity) => {
-          return { ...activity, projectName: (activity.projectName = projects.data.find((project) => project._id === activity.projectId)?.name) };
-        }),
-      );
-      setOpen(null);
-    })();
-  }, [date]);
+    fetchActivities();
+  }, [date, project]);
 
   const days = getDaysInMonth(date.getMonth(), date.getFullYear());
   const onAddActivities = (project) => {
@@ -98,6 +115,7 @@ const Activities = ({ date, user, project }) => {
       const activity = activities[i];
       await api.remove(`/activity/${activity._id}`);
       toast.success(`Deleted ${activity.project}`);
+      fetchActivities();
     }
   }
 

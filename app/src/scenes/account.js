@@ -7,7 +7,7 @@ import Loader from "../components/loader";
 import LoadingButton from "../components/loadingButton";
 import { setUser } from "../redux/auth/actions";
 import api from "../services/api";
-
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 export default () => {
   const user = useSelector((state) => state.Auth.user);
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +18,7 @@ export default () => {
     address: user.address,
   });
   const dispatch = useDispatch();
+  const history = useHistory();
   if (!user) return <Loader />;
 
   async function handleSubmit(e) {
@@ -28,6 +29,7 @@ export default () => {
       const responseData = await api.put(`/user/${user._id}`, body);
       toast.success("Updated!");
       dispatch(setUser(responseData.user));
+      history.push("/");
     } catch (e) {
       console.log(e);
       toast.error("Some Error!");

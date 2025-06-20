@@ -4,11 +4,11 @@ import { Route, Switch } from "react-router-dom";
 import User from "./list";
 import UserView from "./view";
 
-export default () => {
+export default ({ refresh }) => {
   return (
     <Switch>
       <Route path="/user/:id" component={UserView} />
-      <Route path="/" component={User} />
+      <Route path="/" render={(props) => <User {...props} refresh={refresh} />} />
     </Switch>
   );
 };

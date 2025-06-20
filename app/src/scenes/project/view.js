@@ -50,6 +50,19 @@ export default function ProjectView() {
                 className="border !border-[#0560FD] text-[#0560FD] py-[7px] px-[20px] bg-[#FFFFFF] rounded-[16px]">
                 Edit
               </button>
+
+              <button
+                onClick={async () => {
+                  try {
+                    await api.post(`/project/${project?._id}/send-report`);
+                    alert("Report sent successfully!");
+                  } catch (e) {
+                    alert("Error sending report");
+                  }
+                }}
+                className="border !border-[#28a745] text-[#28a745] py-[7px] px-[20px] bg-[#FFFFFF] rounded-[16px]">
+                Send Report Now
+              </button>
             </div>
           </div>
           <ProjectDetails project={project} />
@@ -70,7 +83,7 @@ const ProjectDetails = ({ project }) => {
               <div className="flex justify-between gap-2">
                 <div className="flex gap-20">
                   <span className="w-fit text-[20px] text-[#0C1024] font-bold">Nom du projet : </span>
-                  <span className="w-fit text-[20px] text-[#0C1024] font-bold">{project.name.toString()}</span>
+                  <span className="w-fit text-[20px] text-[#0C1024] font-bold">{project.name}</span>
                 </div>
                 <div className="flex flex-1 flex-column items-end gap-3">
                   <Links project={project} />
