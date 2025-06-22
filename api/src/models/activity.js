@@ -5,7 +5,8 @@ const MODELNAME = "activity";
 const Schema = new mongoose.Schema({
   //projectId: { type: String },
   projectId: { type: mongoose.Schema.Types.ObjectId, ref: "project" },
-  userId: { type: String },
+  // userId: { type: String },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
   userAvatar: { type: String, default: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" },
   userCostPerDay: { type: Number },
   userSellPerDay: { type: Number },

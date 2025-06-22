@@ -78,7 +78,7 @@ const Activities = ({ date, user, project }) => {
   };
   useEffect(() => {
     fetchActivities();
-  }, [date, project]);
+  }, [date]);
 
   const days = getDaysInMonth(date.getMonth(), date.getFullYear());
   const onAddActivities = (project) => {

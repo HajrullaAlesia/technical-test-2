@@ -51,6 +51,7 @@ router.post("/search", passport.authenticate("user", { session: false }), async 
 
     const match = {
       organisation: req.user.organisation,
+      userId: req.user._id,
       date: { $gte: firstDay, $lte: lastDay },
     };
 
